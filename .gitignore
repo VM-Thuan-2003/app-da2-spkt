@@ -1,3 +1,11 @@
 /build
 /dist
 /app.spec
+
+/test_server
+
+/firebase.json
+
+/socket-io-db-firebase-adminsdk.json
+
+/config.py
