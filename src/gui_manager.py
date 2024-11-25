@@ -1,5 +1,29 @@
 import tkinter as tk
 from tkinter import messagebox
+from pathlib import Path
+
+
+class Drone:
+    def __init__(self, frame):
+        pass
+
+    def __enter__(self):
+        return self
+
+
+class Logo:
+    def __init__(self, frame, src, width=100, height=100, x=0, y=0):
+        self.frame = frame
+        self.src = Path(src)
+        self.logo = tk.PhotoImage(file=self.src)
+        self.logo_label = tk.Label(self.frame, image=self.logo)
+        self.logo_label.image = self.logo  # keep a reference
+        self.logo_label.place(
+            relx=x, rely=y, relwidth=width, relheight=height, anchor="center"
+        )
+
+    def __enter__(self):
+        return self
 
 
 class InfoTeam:
@@ -131,6 +155,12 @@ class LoginWindow(GUIManager):
             relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1
         )  # Center the frame and set width and height to 50% of the screen
 
+        # Logo
+        Logo(self.frame, "logo.png", x=0.5, y=0.1, width=1, height=0.2)
+
+        # Drone
+        Logo(self.frame, "img_drone.png", x=0.1, y=0.5, width=0.4, height=0.5)
+
         # Information of the team
         InfoTeam(self.frame)
 
@@ -196,6 +226,11 @@ class RegisterWindow(GUIManager):
             relx=0.5, rely=0.5, anchor="center", relwidth=1, relheight=1
         )  # Center the frame and set width and height to 50% of the screen
 
+        # Logo
+        Logo(self.frame, "logo.png", x=0.5, y=0.1, width=1, height=0.2)
+
+        # Drone
+        Logo(self.frame, "img_drone.png", x=0.1, y=0.5, width=0.4, height=0.5)
         # Information of the team
         InfoTeam(self.frame)
 

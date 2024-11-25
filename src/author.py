@@ -7,12 +7,6 @@ class Role(str, Enum):
     GUEST = "guest"
 
 
-# Example:
-# r = Role.ADMIN
-# print(r.value)  # 'admin'
-# print(r.name)   # 'ADMIN'
-
-
 class Authorization:
     def __init__(self, role: Role):
         self.role = role
