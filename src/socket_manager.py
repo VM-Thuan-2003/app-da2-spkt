@@ -11,7 +11,10 @@ class SocketManager:
         # Register Socket.IO event handlers
         self.sio.on("connect", self.on_connect)
         self.sio.on("disconnect", self.on_disconnect)
-        self.sio.on("message", self.on_message)
+        self.sio.on("error", self.on_error)
+
+        # self.sio.on("message", self.on_message)
+        self.sio.on("web", self.on_message)
 
     def on_connect(self):
         print("Connected to Socket.IO server.")
@@ -19,11 +22,14 @@ class SocketManager:
     def on_disconnect(self):
         print("Disconnected from Socket.IO server.")
 
+    def on_error(self, data):
+        print(f"Socket.IO error: {data}")
+
     def on_message(self, data):
         """Handle incoming messages from the server."""
-        print(f"Message received: {data['data']}")
+        print(f"Message received: {data}")
         # Call the callback to update the GUI
-        self.on_message_callback(data["data"])
+        self.on_message_callback(data)
 
     def start(self, server_url):
         """Start the Socket.IO client in a separate thread."""
@@ -42,6 +48,10 @@ class SocketManager:
     def send_message(self, message):
         """Emit a message to the server."""
         self.sio.emit("message", {"data": message})
+
+    def send_drone(self, message):
+        """Emit a message to the server."""
+        self.sio.emit("drone", {"data": message})
 
     def disconnect(self):
         """Disconnect the Socket.IO client."""

@@ -36,19 +36,29 @@ class MyApp:
 
     def login(self, email, password):
         """Handle login logic with Firebase."""
-        is_authenticated = FirebaseManager.login_user(email, password)
-        if is_authenticated:
-            name = email.split("@")[0]
-            if name == "admin":
-                self.authorization = Authorization(Role.ADMIN)
-            else:
-                self.authorization = Authorization(Role.USER)
-
+        if email is None and password is None:
             self.socket_manager.start(SERVER)  # Connect to the server
             self.login_window.destroy()
-            self.show_main_window()  # Show main window after login
+            self.show_main_window(
+                {"name": "Guest", "role": Role.GUEST}
+            )  # Show main window after login
         else:
-            messagebox.showerror("Login Error", "Invalid email or password.")
+            is_authenticated = FirebaseManager.login_user(email, password)
+            if is_authenticated:
+                name = email.split("@")[0]
+                if name == "admin":
+                    self.authorization = Authorization(Role.ADMIN)
+                else:
+                    self.authorization = Authorization(Role.USER)
+
+                self.socket_manager.start(SERVER)  # Connect to the server
+                self.login_window.destroy()
+
+                self.show_main_window(
+                    {"name": name, "role": self.authorization.role}
+                )  # Show main window after login
+            else:
+                messagebox.showerror("Login Error", "Invalid email or password.")
 
     def register(self, email, password):
         """Handle registration logic with Firebase."""
@@ -67,10 +77,10 @@ class MyApp:
         self.authorization = Authorization(Role.GUEST)
         self.show_login_window()  # Go back to the login screen after logout
 
-    def show_main_window(self):
+    def show_main_window(self, payload):
         """Show the main application window."""
         self.main_window = MainWindow(
-            self.root, self.send_message, self.logout_from_main
+            self.root, self.send_message, self.logout_from_main, payload
         )
 
     def send_message(self, message):
@@ -79,7 +89,7 @@ class MyApp:
 
     def update_gui_label(self, text):
         """Update the label via the GUI manager."""
-        self.main_window.update_label(text)
+        self.main_window.update_socket(text)
 
 
 if __name__ == "__main__":

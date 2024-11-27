@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox
 from pathlib import Path
+from src.author import Role
+
+from src.components import InfoDrone, Attitude, Gps
 
 
 class Drone:
@@ -91,45 +94,46 @@ class GUIManager:
 class MainWindow(GUIManager):
     """This class creates the main window of the application."""
 
-    def __init__(self, root, send_callback, logout_callback):
+    def __init__(
+        self,
+        root,
+        send_callback,
+        logout_callback,
+        user={"name": "GUEST", "role": Role.GUEST},
+    ):
         """Initialize the main window."""
         super().__init__(root)  # Initialize default GUI elements
         self.send_callback = send_callback
         self.logout_callback = logout_callback
+        self.user = user
 
-        self.frame = tk.Frame(root)
-
-        # Label to display server messages
-        self.label = tk.Label(
-            self.frame, text="Waiting for server messages...", font=("Arial", 12)
-        )
-        self.label.pack(pady=20)
-
-        # Entry box for sending messages
-        self.entry = tk.Entry(self.frame, width=30)
-        self.entry.pack(pady=10)
-
-        # Button to send a message
-        self.send_button = tk.Button(
-            self.frame, text="Send Message", command=self.send_message
-        )
-        self.send_button.pack(pady=10)
-
-        # Button to logout
-        self.logout_button = tk.Button(self.frame, text="Logout", command=self.logout)
-        self.logout_button.pack(pady=10)
-
+        self.frame = tk.Frame(root, width=self.screen_width, height=self.screen_height)
         self.frame.pack()
 
-    def send_message(self):
-        """Send a message to the server."""
-        message = self.entry.get()
-        self.entry.delete(0, tk.END)
-        self.send_callback(message)
+        # Label to display user name and role
+        self.name_role = tk.Label(
+            root,
+            text=f"{self.user['name']} ({self.user['role'].name})",
+            font=("Arial", 12),
+        )
+        self.name_role.place(relx=0.99, rely=0.01, anchor="ne")
 
-    def update_label(self, message):
-        """Update the label with a new message."""
-        self.label.config(text=message)
+        # Button to logout
+        self.logout_button = tk.Button(root, text="Logout", command=self.logout)
+        self.logout_button.place(relx=0.99, rely=0.04, anchor="ne")
+
+        # Info Drone
+        self.infoDrone = InfoDrone.InfoDrone(root, send_callback=self.send_callback)
+
+        self.attitude = Attitude.Attitude(root, send_callback=self.send_callback)
+
+        self.gps = Gps.Gps(root, send_callback=self.send_callback)
+
+    def update_socket(self, message):
+        """Update the label with a new message from the server."""
+        self.infoDrone.update_socket(message)
+        self.attitude.update_socket(message)
+        self.gps.update_socket(message)
 
     def logout(self):
         """Logout and go back to the login window."""
@@ -186,6 +190,12 @@ class LoginWindow(GUIManager):
         self.login_button = tk.Button(button_frame, text="Login", command=self.login)
         self.login_button.pack(side=tk.LEFT, padx=5)
 
+        # Login no Account button
+        self.login_no_account_button = tk.Button(
+            button_frame, text="Login no Account", command=self.login_no_account
+        )
+        self.login_no_account_button.pack(side=tk.LEFT, padx=5)
+
         # Register button
         self.register_button = tk.Button(
             button_frame, text="Register", command=self.register
@@ -202,6 +212,10 @@ class LoginWindow(GUIManager):
             messagebox.showwarning(
                 "Input Error", "Please enter both email and password."
             )
+
+    def login_no_account(self):
+        """Handle the login button click."""
+        self.on_login_callback(None, None)
 
     def register(self):
         """Switch to the register form."""
