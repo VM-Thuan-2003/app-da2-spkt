@@ -27,7 +27,7 @@ class SocketManager:
 
     def on_message(self, data):
         """Handle incoming messages from the server."""
-        print(f"Message received: {data}")
+        # print(f"Message received: {data}")
         # Call the callback to update the GUI
         self.on_message_callback(data)
 

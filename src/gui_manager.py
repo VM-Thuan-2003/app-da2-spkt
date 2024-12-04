@@ -3,7 +3,7 @@ from tkinter import messagebox
 from pathlib import Path
 from src.author import Role
 
-from src.components import InfoDrone, Attitude, Gps
+from src.components import InfoDrone, Attitude, Gps, Map
 
 
 class Drone:
@@ -129,11 +129,14 @@ class MainWindow(GUIManager):
 
         self.gps = Gps.Gps(root, send_callback=self.send_callback)
 
+        self.map = Map.Map(root, send_callback=self.send_callback)
+
     def update_socket(self, message):
         """Update the label with a new message from the server."""
         self.infoDrone.update_socket(message)
         self.attitude.update_socket(message)
         self.gps.update_socket(message)
+        self.map.update_socket(message)
 
     def logout(self):
         """Logout and go back to the login window."""

@@ -92,7 +92,6 @@ class Gps:
     def update_socket(self, message):
         if message["header"] == "droneStatusGps":
             self.payload_socket_gps = message["data"]
-            print(f"payload_socket_gps: {self.payload_socket_gps}")
 
             self.sat_value.config(text=self.payload_socket_gps["sat"])
             self.fix_value.config(text=self.payload_socket_gps["fix"])

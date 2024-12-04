@@ -15,6 +15,7 @@ class MyApp:
         self.root = root
         self.socket_manager = SocketManager(self.update_gui_label)
         self.authorization = Authorization(Role.GUEST)
+        self.main_window = None
         # Start with the login screen
         self.show_login_window()
 
@@ -26,10 +27,7 @@ class MyApp:
 
     def show_register_window(self):
         """Display the registration window."""
-
-        # Destroy the login window
         self.login_window.destroy()
-        # Create the registration window
         self.register_window = RegisterWindow(
             self.root, self.register, self.show_login_window
         )
@@ -37,11 +35,9 @@ class MyApp:
     def login(self, email, password):
         """Handle login logic with Firebase."""
         if email is None and password is None:
-            self.socket_manager.start(SERVER)  # Connect to the server
+            self.socket_manager.start(SERVER)
             self.login_window.destroy()
-            self.show_main_window(
-                {"name": "Guest", "role": Role.GUEST}
-            )  # Show main window after login
+            self.show_main_window({"name": "Guest", "role": Role.GUEST})
         else:
             is_authenticated = FirebaseManager.login_user(email, password)
             if is_authenticated:
@@ -51,12 +47,10 @@ class MyApp:
                 else:
                     self.authorization = Authorization(Role.USER)
 
-                self.socket_manager.start(SERVER)  # Connect to the server
+                self.socket_manager.start(SERVER)
                 self.login_window.destroy()
 
-                self.show_main_window(
-                    {"name": name, "role": self.authorization.role}
-                )  # Show main window after login
+                self.show_main_window({"name": name, "role": self.authorization.role})
             else:
                 messagebox.showerror("Login Error", "Invalid email or password.")
 
@@ -66,16 +60,17 @@ class MyApp:
         if success:
             messagebox.showinfo("Registration Success", "User successfully registered.")
             self.register_window.destroy()
-            self.show_login_window()  # Go back to the login screen after registration
+            self.show_login_window()
         else:
             messagebox.showerror("Registration Error", "Error during registration.")
 
     def logout_from_main(self):
         """Logout from the main application."""
         self.socket_manager.disconnect()
-        self.main_window.destroy()
+        if self.main_window:
+            self.main_window.destroy()
         self.authorization = Authorization(Role.GUEST)
-        self.show_login_window()  # Go back to the login screen after logout
+        self.show_login_window()
 
     def show_main_window(self, payload):
         """Show the main application window."""
@@ -89,7 +84,8 @@ class MyApp:
 
     def update_gui_label(self, text):
         """Update the label via the GUI manager."""
-        self.main_window.update_socket(text)
+        if self.main_window:
+            self.main_window.update_socket(text)
 
 
 if __name__ == "__main__":

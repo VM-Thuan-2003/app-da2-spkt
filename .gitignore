@@ -11,3 +11,5 @@
 /config.py
 
 /test
+
+.pycache__/
