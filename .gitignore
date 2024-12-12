@@ -13,3 +13,4 @@
 /test
 
 .pycache__/
+/**/__pycache__/
