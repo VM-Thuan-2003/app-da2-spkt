@@ -3,8 +3,11 @@ from tkinter import messagebox
 from src.firebase_manager import FirebaseManager
 from src.socket_manager import SocketManager
 from src.gui_manager import MainWindow, LoginWindow, RegisterWindow
+from src.read_udp import VideoClient
 from src.author import Role, Authorization
-from config import SERVER
+from config import SERVER, SERVER_STREAM
+
+import cv2
 
 
 class MyApp:
@@ -14,6 +17,7 @@ class MyApp:
         """Initialize the application."""
         self.root = root
         self.socket_manager = SocketManager(self.update_gui_label)
+        self.video_client = VideoClient(SERVER_STREAM, "123456", self.on_video_frame)
         self.authorization = Authorization(Role.GUEST)
         self.main_window = None
         # Start with the login screen
@@ -36,6 +40,7 @@ class MyApp:
         """Handle login logic with Firebase."""
         if email is None and password is None:
             self.socket_manager.start(SERVER)
+            self.video_client.connect_to_server()
             self.login_window.destroy()
             self.show_main_window({"name": "Guest", "role": Role.GUEST})
         else:
@@ -48,6 +53,7 @@ class MyApp:
                     self.authorization = Authorization(Role.USER)
 
                 self.socket_manager.start(SERVER)
+                self.video_client.connect_to_server()
                 self.login_window.destroy()
 
                 self.show_main_window({"name": name, "role": self.authorization.role})
@@ -86,6 +92,10 @@ class MyApp:
         """Update the label via the GUI manager."""
         if self.main_window:
             self.main_window.update_socket(text)
+
+    def on_video_frame(self, frame):
+        if self.main_window and frame is not None:
+            self.main_window.update_video(frame)
 
 
 if __name__ == "__main__":

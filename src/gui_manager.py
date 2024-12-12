@@ -3,7 +3,7 @@ from tkinter import messagebox
 from pathlib import Path
 from src.author import Role
 
-from src.components import InfoDrone, Attitude, Gps, Map
+from src.components import InfoDrone, Attitude, Gps, Map, Vrx
 
 
 class Drone:
@@ -86,8 +86,8 @@ class GUIManager:
 
         # Set window title and geometry
         self.root.title("Decentralized Tkinter with Socket.IO")
-        self.screen_width = int(self.root.winfo_screenwidth() * 0.8)
-        self.screen_height = int(self.root.winfo_screenheight() * 0.8)
+        self.screen_width = int(self.root.winfo_screenwidth() * 0.9)
+        self.screen_height = int(self.root.winfo_screenheight() * 0.9)
         self.root.geometry(f"{self.screen_width}x{self.screen_height}")
 
 
@@ -131,12 +131,17 @@ class MainWindow(GUIManager):
 
         self.map = Map.Map(root, send_callback=self.send_callback)
 
+        self.vrx = Vrx.Vrx(root, send_callback=self.send_callback)
+
     def update_socket(self, message):
         """Update the label with a new message from the server."""
         self.infoDrone.update_socket(message)
         self.attitude.update_socket(message)
         self.gps.update_socket(message)
         self.map.update_socket(message)
+
+    def update_video(self, frame):
+        self.vrx.update_video(frame)
 
     def logout(self):
         """Logout and go back to the login window."""
