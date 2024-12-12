@@ -28,7 +28,7 @@ class Attitude:
             highlightbackground="black",
             highlightthickness=1,
         )
-        self.box.place(x=210, y=10)
+        self.box.place(x=356, y=10)
 
         # Configure grid for dynamic resizing
         for i in range(4):  # 4 rows for labels

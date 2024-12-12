@@ -28,7 +28,7 @@ class InfoDrone:
             highlightbackground="black",
             highlightthickness=1,
         )
-        self.box.place(x=10, y=10)
+        self.box.place(x=120, y=10)
 
         # Configure grid weights for dynamic resizing
         for i in range(9):  # 9 rows in total
