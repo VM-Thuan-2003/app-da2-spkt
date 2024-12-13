@@ -100,21 +100,33 @@ class InfoDrone:
         self.status_value.grid(row=9, column=1, padx=5, pady=5, sticky="nsew")
 
     def update_socket(self, message):
-        if message["header"] == "droneStatusInfo":
+        if (
+            message["header"] == "droneStatusInfo"
+            or message["header"] == "droneStatusInfor"
+        ):
             self.payload_socket_info = message["data"]
 
-            self.firmware_value.config(text=self.payload_socket_info["firmware"])
+            self.firmware_value.config(text=self.payload_socket_info["firmware"][3:])
             self.type_value.config(text=self.payload_socket_info["type"])
             self.mode_value.config(text=self.payload_socket_info["mode"])
+
             self.battery_voltage_value.config(
                 text=f'{float(self.payload_socket_info["battery"]["voltage"]):.2f} V'
             )
-            self.battery_current_value.config(
-                text=f'{float(self.payload_socket_info["battery"]["current"]):.2f} A'
-            )
-            self.battery_level_value.config(
-                text=f'{float(self.payload_socket_info["battery"]["level"]):.2f} %'
-            )
+            if (
+                self.payload_socket_info["battery"]["current"] != "None"
+                and self.payload_socket_info["battery"]["current"] is not None
+            ):
+                self.battery_current_value.config(
+                    text=f'{float(self.payload_socket_info["battery"]["current"]):.2f} A'
+                )
+            if (
+                self.payload_socket_info["battery"]["level"] != "None"
+                and self.payload_socket_info["battery"]["level"] is not None
+            ):
+                self.battery_level_value.config(
+                    text=f'{float(self.payload_socket_info["battery"]["level"]):.2f} %'
+                )
             self.heartbeat_value.config(
                 text=f'{float(self.payload_socket_info["heartbeat"]):.2f}'
             )

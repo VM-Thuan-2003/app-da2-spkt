@@ -95,7 +95,10 @@ class Attitude:
         return rad * 180 / math.pi
 
     def update_socket(self, message):
-        if message["header"] == "droneStatusAttitude":
+        if (
+            message["header"] == "droneStatusAttitude"
+            or message["header"] == "droneStatusAtitude"
+        ):
             self.payload_socket_attitude = message["data"]
             self.pitch_value.config(
                 text=f"{float(self.payload_socket_attitude['attitude']['pitch']):.2f} deg"

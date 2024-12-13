@@ -95,6 +95,17 @@ class CommandNotify:
 
             self.yolo_detect_last_update = time.time()
 
+        if (
+            socket["header"] == "droneStatusInfo"
+            or socket["header"] == "droneStatusInfor"
+        ):
+            if socket["data"]["status"] == "ACTIVE" and not self.flag_flying:
+                self.flag_flying = True
+                self.fly_time_start = time.time()
+            elif socket["data"]["status"] == "STANDBY" and self.flag_flying:
+                self.flag_flying = False
+                self.fly_time_start = None
+
     def check_fire_loop(self):
         while True:
             current_time = time.time()
