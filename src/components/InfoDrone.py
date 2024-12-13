@@ -106,7 +106,7 @@ class InfoDrone:
         ):
             self.payload_socket_info = message["data"]
 
-            self.firmware_value.config(text=self.payload_socket_info["firmware"][3:])
+            self.firmware_value.config(text=self.payload_socket_info["firmware"][4:])
             self.type_value.config(text=self.payload_socket_info["type"])
             self.mode_value.config(text=self.payload_socket_info["mode"])
 
