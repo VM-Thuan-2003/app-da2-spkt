@@ -21,6 +21,7 @@ class SocketManager:
 
     def on_disconnect(self):
         print("Disconnected from Socket.IO server.")
+        self.preconnect()
 
     def on_error(self, data):
         print(f"Socket.IO error: {data}")
@@ -67,3 +68,7 @@ class SocketManager:
     def disconnect(self):
         """Disconnect the Socket.IO client."""
         self.sio.disconnect()
+
+    def preconnect(self):
+        """Placeholder for preconnect logic."""
+        print("Preparing to reconnect...")

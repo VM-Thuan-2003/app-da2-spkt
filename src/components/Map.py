@@ -144,6 +144,11 @@ class Map:
             command=self.add_marker_event,
             pass_coords=True,
         )
+        self.map_widget.add_right_click_menu_command(
+            label="goto point",
+            command=self.run_wp,
+            pass_coords=True,
+        )
 
         self.marker_list_text = tk.Text(
             self.frame_right, height=10, width=20, font=("Helvetica", 10)
@@ -266,17 +271,28 @@ class Map:
         }
         self.send_callback(payload)
 
+    def run_wp(self, coord):
+        payload = {
+            "lat": coord[0],
+            "lng": coord[1],
+            "alt": int(self.altitude_entry.get()),
+            "speed": int(self.velocity_entry.get()),
+            "mode": None,
+        }
+        self.send_command("run_waypoint", payload)
+
     def load_waypoints_event(self):
         serializable_marker_list = [
             {
-                "position": marker["position"],
-                "altitude": marker.get("altitude"),
-                "velocity": marker.get("velocity"),
-                "text": marker["marker"].text,
+                "lat": marker["position"][0],
+                "lng": marker["position"][1],
+                "alt": marker.get("altitude"),
+                "speed": marker.get("velocity"),
+                "mode": marker["marker"].text,
             }
             for marker in self.marker_list
         ]
-        self.send_command("loadWaypoints", serializable_marker_list)
+        self.send_command("load_waypoints", serializable_marker_list)
 
     def update_marker_list_text(self):
         text = ""
@@ -287,16 +303,21 @@ class Map:
         self.connect_marker()
 
     def update_current_position(self):
+        if not hasattr(self, "current_marker") or self.current_marker is None:
+            self.current_marker = []
 
-        if self.current_marker:
-            self.map_widget.delete(self.current_marker)
+        for marker in self.current_marker:
+            self.map_widget.delete(marker)
 
-        self.current_marker = self.map_widget.set_marker(
+        self.current_marker.clear()
+
+        new_marker = self.map_widget.set_marker(
             float(self.curr_position[0]),
             float(self.curr_position[1]),
             text="Current Position",
             marker_color_outside="red",
         )
+        self.current_marker.append(new_marker)
 
         self.count += 1
         if self.count >= 10:
@@ -306,6 +327,9 @@ class Map:
             )
 
     def update_socket(self, message):
+        if self.current_marker is not None:
+            for marker in self.current_marker:
+                self.map_widget.delete(marker)
         if message["header"] == "droneStatusGps":
             # print(f"updating map {message}")
             self.curr_position = message["data"]["lat"], message["data"]["lon"]

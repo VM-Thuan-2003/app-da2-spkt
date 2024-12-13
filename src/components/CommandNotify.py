@@ -87,7 +87,6 @@ class CommandNotify:
                 if self.yolo_detect["conf"] > 0.5
                 else "There are no forest fires"
             )
-
             self.label.config(
                 text=f"{self.yolo_detect['label']}: {self.yolo_detect['conf']:.2f} ({self.yolo_detect['warn']})",
                 fg="red" if self.yolo_detect["conf"] > 0.5 else "green",
@@ -108,14 +107,38 @@ class CommandNotify:
 
     def check_fire_loop(self):
         while True:
+
             current_time = time.time()
+
             if current_time - self.yolo_detect_last_update > 5:
                 if self.yolo_detect == self.yolo_detect_old:
+                    self.yolo_detect["conf"] = 0
                     self.label.config(
                         text="There are no forest fires",
                         fg="green",
                     )
+
             self.yolo_detect_old = dict(self.yolo_detect)
+
+            if self.yolo_detect["conf"] > 0.65:
+                self.send_command(
+                    "fire_detection",
+                    {
+                        "conf": self.yolo_detect["conf"],
+                        "buzzer": True,
+                        "label": self.yolo_detect["label"],
+                    },
+                )
+            else:
+                self.send_command(
+                    "fire_detection",
+                    {
+                        "conf": self.yolo_detect["conf"],
+                        "buzzer": False,
+                        "label": self.yolo_detect["label"],
+                    },
+                )
+
             time.sleep(2)
 
     def update_flytime_loop(self):
@@ -142,16 +165,13 @@ class CommandNotify:
 
     def takeoff(self):
         altitude = int(self.altitude_entry.get())
-        self.send_command("takeoff", altitude)
-        self.fly_time_start = time.time()
+        self.send_command("takeoff", {"alt": altitude, "takeoff": True})
 
     def toggle_land(self):
         if self.is_landed:
             self.send_command("land", False)
-            self.fly_time_start = time.time()
         else:
             self.send_command("land", True)
-            self.fly_time_start = None
         self.is_landed = not self.is_landed
 
     def change_mode(self, value):
@@ -160,7 +180,7 @@ class CommandNotify:
         elif value == "ALT":
             value = "ALT_HOLD"
         elif value == "POS":
-            value = "POS_HOLD"
+            value = "POSHOLD"
         elif value == "AUTO":
             value = "AUTO"
-        self.send_command("change_mode", value)
+        self.send_command("change_mode", {"mode": value})

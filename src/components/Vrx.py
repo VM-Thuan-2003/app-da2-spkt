@@ -39,7 +39,6 @@ class Vrx:
         resized = cv2.resize(cv2_image, dim, interpolation=cv2.INTER_AREA)
         img = Image.fromarray(resized)
         imgtk = ImageTk.PhotoImage(image=img)
-
         # Update the label with the new image
         self.video_label.imgtk = imgtk
         self.video_label.configure(image=imgtk)
