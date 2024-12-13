@@ -27,7 +27,7 @@ class Vrx:
         self.video_label = tk.Label(self.box)
         self.video_label.place(x=0, y=60, relwidth=1, relheight=0.8)
 
-        self.box.place(x=120, y=self.screen_height - 580)
+        self.box.place(x=120, y=self.screen_height - 560)
 
     def update_video(self, frame):
         # Convert the frame to a format suitable for Tkinter

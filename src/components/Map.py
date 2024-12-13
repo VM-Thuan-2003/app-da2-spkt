@@ -216,6 +216,9 @@ class Map:
         for marker_dict in self.marker_list:
             marker_dict["marker"].delete()
         self.marker_list.clear()
+        if self.marker_path:
+            self.map_widget.delete(self.marker_path)
+            self.marker_path = None
         self.update_marker_list_text()
 
     def change_map(self, new_map_type):
@@ -254,14 +257,26 @@ class Map:
                 "https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg"
             )
 
+    def send_command(self, command, data):
+        payload = {
+            "stream": "controlMsg",
+            "direction": "drone",
+            "header": command,
+            "data": data,
+        }
+        self.send_callback(payload)
+
     def load_waypoints_event(self):
-        for i, marker_dict in enumerate(self.marker_list):
-            print(
-                f"Marker {i+1}: Lat: {marker_dict['position'][0]:.6f}, "
-                f"Lon: {marker_dict['position'][1]:.6f}, "
-                f"Altitude: {marker_dict['altitude']} m, "
-                f"Velocity: {marker_dict['velocity']} m/s"
-            )
+        serializable_marker_list = [
+            {
+                "position": marker["position"],
+                "altitude": marker.get("altitude"),
+                "velocity": marker.get("velocity"),
+                "text": marker["marker"].text,
+            }
+            for marker in self.marker_list
+        ]
+        self.send_command("loadWaypoints", serializable_marker_list)
 
     def update_marker_list_text(self):
         text = ""

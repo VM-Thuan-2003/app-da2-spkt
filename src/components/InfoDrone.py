@@ -18,6 +18,7 @@ class InfoDrone:
             "heartbeat": 0.5,
             "armed": False,
             "flagDisiableArmed": "False",
+            "status": "OK",
         }
 
         self.screen_width = frame.winfo_screenwidth()
@@ -31,8 +32,8 @@ class InfoDrone:
         self.box.place(x=120, y=10)
 
         # Configure grid weights for dynamic resizing
-        for i in range(9):  # 9 rows in total
-            self.box.grid_rowconfigure(i, weight=0, minsize=26)  # fix height to 30
+        for i in range(10):  # 10 rows in total
+            self.box.grid_rowconfigure(i, weight=0, minsize=18)
         self.box.grid_columnconfigure(0, weight=1)
         self.box.grid_columnconfigure(1, weight=1)
 
@@ -93,6 +94,11 @@ class InfoDrone:
         )
         self.flagDisableArmed_value.grid(row=8, column=1, padx=5, pady=5, sticky="nsew")
 
+        self.status_label = tk.Label(self.box, text="Status:")
+        self.status_label.grid(row=9, column=0, padx=5, pady=5, sticky="nsew")
+        self.status_value = tk.Label(self.box, text=self.payload_socket_info["status"])
+        self.status_value.grid(row=9, column=1, padx=5, pady=5, sticky="nsew")
+
     def update_socket(self, message):
         if message["header"] == "droneStatusInfo":
             self.payload_socket_info = message["data"]
@@ -116,6 +122,8 @@ class InfoDrone:
             self.flagDisableArmed_value.config(
                 text=self.payload_socket_info["flagDisiableArmed"]
             )
+
+            self.status_value.config(text=self.payload_socket_info["status"])
 
     def __enter__(self):
         return self

@@ -44,6 +44,10 @@ class VideoClient:
         self.thread.start()
         self.sio.wait()
 
+    def disconnect(self):
+        """Disconnect the Streaming client."""
+        self.sio.disconnect()
+
 
 if __name__ == "__main__":
     # Usage

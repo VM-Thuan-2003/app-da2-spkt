@@ -7,8 +7,6 @@ from src.read_udp import VideoClient
 from src.author import Role, Authorization
 from config import SERVER, SERVER_STREAM
 
-import cv2
-
 
 class MyApp:
     """Main application that integrates SocketManager and Firebase Authentication."""
@@ -73,6 +71,7 @@ class MyApp:
     def logout_from_main(self):
         """Logout from the main application."""
         self.socket_manager.disconnect()
+        self.video_client.disconnect()
         if self.main_window:
             self.main_window.destroy()
         self.authorization = Authorization(Role.GUEST)
@@ -86,7 +85,7 @@ class MyApp:
 
     def send_message(self, message):
         """Send a message to the Socket.IO server."""
-        self.socket_manager.send_message(message)
+        self.socket_manager.send_message(message=message)
 
     def update_gui_label(self, text):
         """Update the label via the GUI manager."""

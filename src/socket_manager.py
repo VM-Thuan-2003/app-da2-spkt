@@ -45,9 +45,20 @@ class SocketManager:
         self.thread = Thread(target=run_socket_io, daemon=True)
         self.thread.start()
 
-    def send_message(self, message):
-        """Emit a message to the server."""
-        self.sio.emit("message", {"data": message})
+    def send_message(self, message, status=None):
+        """
+        Send a message to the server.
+        """
+
+        stream = message["stream"]
+        direction = message["direction"]
+        header = message["header"]
+        data = message["data"]
+
+        self.sio.emit(
+            stream,
+            {"direction": direction, "header": header, "data": data, "status": status},
+        )
 
     def send_drone(self, message):
         """Emit a message to the server."""

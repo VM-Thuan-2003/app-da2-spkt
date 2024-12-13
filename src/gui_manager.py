@@ -123,19 +123,25 @@ class MainWindow(GUIManager):
         self.logout_button.place(relx=0.99, rely=0.04, anchor="ne")
 
         # Info Drone
-        self.infoDrone = InfoDrone.InfoDrone(root, send_callback=self.send_callback)
+        self.infoDrone = InfoDrone.InfoDrone(root, send_callback=self.middleware)
 
-        self.attitude = Attitude.Attitude(root, send_callback=self.send_callback)
+        self.attitude = Attitude.Attitude(root, send_callback=self.middleware)
 
-        self.gps = Gps.Gps(root, send_callback=self.send_callback)
+        self.gps = Gps.Gps(root, send_callback=self.middleware)
 
-        self.map = Map.Map(root, send_callback=self.send_callback)
+        self.map = Map.Map(root, send_callback=self.middleware)
 
-        self.vrx = Vrx.Vrx(root, send_callback=self.send_callback)
+        self.vrx = Vrx.Vrx(root, send_callback=self.middleware)
 
         self.commandNotify = CommandNotify.CommandNotify(
-            root, send_callback=self.send_callback
+            root, send_callback=self.middleware
         )
+
+    def middleware(self, message):
+        """Middleware function to handle the send_callback."""
+        if self.user["role"] != Role.GUEST:
+            print(f"Sending message: {message}")
+            self.send_callback(message)
 
     def update_socket(self, message):
         """Update the label with a new message from the server."""

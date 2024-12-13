@@ -28,7 +28,7 @@ class Gps:
             width=300,
             height=300,
         )
-        self.box.place(x=356, y=120)
+        self.box.place(x=356, y=134)
 
         # Configure grid for fixed height and dynamic width
         for i in range(5):  # 5 rows for labels
